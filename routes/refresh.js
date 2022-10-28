@@ -6,8 +6,8 @@ const router = Router()
 router.post('/',
     async (req, res, next) => {
         passport.authenticate(
-            'login',
-            { session: false },
+            'refresh',
+            {session: false},
             async (err, user, info) => {
                 if (err) {
                     console.error(err)
@@ -19,19 +19,17 @@ router.post('/',
                         res.status(400).json({success: false, message: info.message})
                         return 
                     }
-                    
                     res.json({
-                        success: true,
+                        success: true, 
                         message: info.message,
                         access: info.tokens.access,
                         refresh: info.tokens.refresh
                     })
-
                 } catch (error) {
-                    return next(error);
+                    return next(error)
                 }
             }
-        )(req, res, next);
+        )(req, res, next)
     }
 )
 
