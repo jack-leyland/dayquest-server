@@ -10,7 +10,6 @@ export const regRequestisValid = (req) => {
   }
   
 export const loginRequestisValid = (req) => {
-    if (!Object.hasOwn(req, 'type')) return false;
     if (!Object.hasOwn(req, 'device')) return false;
     return true
   }

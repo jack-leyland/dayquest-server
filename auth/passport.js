@@ -96,13 +96,10 @@ passport.use(
           return done(null, false, {message: "Missing fields"})
         }
         try {
-          let user = null
-          if (req.body.type === 'email') {
-            user = await UserModel.findOne({ email: id });
-          } else if (req.body.type === 'username') {
+          let user = await UserModel.findOne({ email: id });
+          if (!user) {
             user = await UserModel.findOne({ username: id });
           }
-  
           if (!user) {
             return done(null, false, { message: 'User not found' });
           }
