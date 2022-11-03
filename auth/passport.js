@@ -58,13 +58,13 @@ passport.use(
               email: email, 
               password: password, 
               username: req.body.username, 
-              devices: [req.body.device],
+              devices: [req.headers.device],
             });
 
           await RefreshTokenModel.create(
             {
               userId: userId,
-              deviceId: req.body.device,
+              deviceId: req.headers.device,
               token: tokens.refresh
           })
           
@@ -105,14 +105,14 @@ passport.use(
           }
   
           const pwdValid = await user.isValidPassword(password);
-          const deviceRecognized = user.devices.includes(req.body.device)
+          const deviceRecognized = user.devices.includes(req.headers.device)
           const body = { userId: user.userId, username: user.username};
           const tokens = generateTokens(body, false)
 
           if (!pwdValid) {
             await LoginModel.create({
               userId: user.userId,
-              device: req.body.device,
+              device: req.headers.device,
               deviceRecognized: deviceRecognized,
               successful: false
             }) 
@@ -121,22 +121,22 @@ passport.use(
 
           //New device login
           if (!deviceRecognized) {
-            user.devices.push(req.body.device)
+            user.devices.push(req.headers.device)
             await user.save()
             await RefreshTokenModel.create({
               userId: user.userId,
-              deviceId: req.body.device,
+              deviceId: req.headers.device,
               token: tokens.refresh
             })
           } else {
-            let tokenRecord = await RefreshTokenModel.findOne({userId: user.userId, deviceId: req.body.device})
+            let tokenRecord = await RefreshTokenModel.findOne({userId: user.userId, deviceId: req.headers.device})
             tokenRecord.token = tokens.refresh
             await tokenRecord.save()
           }
           
           await LoginModel.create({
             userId: user.userId,
-            device: req.body.device,
+            device: req.headers.device,
             deviceRecognized: deviceRecognized,
             successful: true
           })
