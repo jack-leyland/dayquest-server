@@ -5,7 +5,7 @@ import {default as UserModel} from '../models/User.js';
 import {v4 as uuid} from 'uuid';
 import {default as LoginModel} from '../models/Logins.js';
 import {default as RefreshTokenModel} from '../models/RefreshTokens.js';
-import {regRequestisValid, loginRequestisValid, generateTokens} from "./helpers.js";
+import {regRequestisValid, generateTokens} from "./helpers.js";
 import {default as config} from '../config/index.js';
 import jwt from 'jsonwebtoken';
 
@@ -92,16 +92,13 @@ passport.use(
         passReqToCallback: true,
       },
       async (req, id, password, done) => {
-        if (!loginRequestisValid(req.body)) {
-          return done(null, false, {message: "Missing fields"})
-        }
         try {
           let user = await UserModel.findOne({ email: id });
           if (!user) {
             user = await UserModel.findOne({ username: id });
           }
           if (!user) {
-            return done(null, false, { message: 'User not found' });
+            return done(null, false, { message: 'No matching account found.', badField: "id" });
           }
   
           const pwdValid = await user.isValidPassword(password);
@@ -116,7 +113,7 @@ passport.use(
               deviceRecognized: deviceRecognized,
               successful: false
             }) 
-            return done(null, false, { message: 'Bad Password' });
+            return done(null, false, { message: 'Invalid Password', badField: "password" });
           }
 
           //New device login

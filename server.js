@@ -81,9 +81,37 @@ async function startServer() {
     app.use(express.urlencoded({ extended: false }))
 
     //REST auth routes
+
+    //temp dev logger
+    app.use('/', 
+    (req, res, next) => {
+      let current_datetime = new Date();
+      let formatted_date =
+        current_datetime.getFullYear() +
+        "-" +
+        (current_datetime.getMonth() + 1) +
+        "-" +
+        current_datetime.getDate() +
+        " " +
+        current_datetime.getHours() +
+        ":" +
+        current_datetime.getMinutes() +
+        ":" +
+        current_datetime.getSeconds();
+      let method = req.method;
+      let url = req.url;
+      let status = res.statusCode;
+      let log = `[${formatted_date}] ${method}:${url} ${status}`;
+      console.log(log);
+      console.log(req.body)
+      next();
+    }
+    )
     app.use('/register', registerRouter)
     app.use('/login', loginRouter)
     app.use('/refresh', refreshRouter)
+
+
 
 
     const httpServer = http.createServer(app);

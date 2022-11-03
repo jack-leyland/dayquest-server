@@ -20,19 +20,26 @@ router.post('/',
               res.status(400).json({
                 success: false,
                 message: `Missing registration fields`,
-                user: null
+                alreadyExists: null,
+                user: null,
+                token: null,
+                refresh: null
               })
             } else {
-              res.status(400).json({
+              res.json({
                 success: false,
-                message: `${info.alreadyExists} exists`,
-                user: null
+                message: null,
+                alreadyExists: info.alreadyExists,
+                user: null,
+                token: null,
+                refresh: null
               })
             }
           } else {
             res.json({
               success: true,
               message: 'Registration Sucessful',
+              alreadyExists: null,
               user: user,
               token: info.tokens.access,
               refresh: info.tokens.refresh

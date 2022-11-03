@@ -13,18 +13,25 @@ router.post('/',
                     console.error(err)
                     res.status(500).send('Server Error')
                     return;
-                    }
+                }
                 try {
                     if (!user) {
-                        res.status(400).json({success: false, message: info.message})
-                        return 
+                        res.json({
+                            success: false, 
+                            message: info.message, 
+                            access: null,
+                            refresh: null,
+                            badField: info.badField
+                        })
+                        return
                     }
-                    
+
                     res.json({
                         success: true,
                         message: info.message,
                         access: info.tokens.access,
-                        refresh: info.tokens.refresh
+                        refresh: info.tokens.refresh,
+                        badField: null
                     })
 
                 } catch (error) {
