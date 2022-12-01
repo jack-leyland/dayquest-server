@@ -4,7 +4,20 @@ import {default as config} from '../config/index.js'
 
 
 export const regRequestisValid = (req) => {
-    if (!Object.hasOwn(req, 'username')) return false;
+    if (!Object.hasOwn(req.body, 'username')) return false;
+    if (!Object.hasOwn(req.body, 'email')) return false;
+    if (!Object.hasOwn(req.body, 'password')) return false;
+    return true
+  }
+
+export const loginRequestisValid = (req) => {
+    if (!Object.hasOwn(req.body, 'id')) return false;
+    if (!Object.hasOwn(req.body, 'password')) return false;
+    return true
+  }
+
+export const refreshRequestisValid = (req) => {
+    if (!Object.hasOwn(req.body, 'refresh_token')) return false;
     return true
   }
 

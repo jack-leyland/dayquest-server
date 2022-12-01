@@ -1,29 +1,10 @@
 import express  from 'express';
 import cors from 'cors';
-import http from 'http';
 import passport from 'passport';
-import "./auth/passport.js"
+import "./src/auth/strategies/index.js"
 import mongoose from 'mongoose';
-import config from './config/index.js';
-import { ApolloServer} from '@apollo/server';
-import { expressMiddleware } from '@apollo/server/express4';
-import { ApolloServerPluginDrainHttpServer } from '@apollo/server/plugin/drainHttpServer';
-import gql from 'graphql-tag';
-import {default as loginRouter } from './routes/login.js'
-import {default as registerRouter } from './routes/register.js'
-import {default as refreshRouter } from './routes/refresh.js'
-
-const typeDefs = gql`
-  type Query {
-    hello: String
-  }
-`;
-
-const resolvers = {
-    Query: {
-      hello: () => 'Hello world!',
-    },
-  };
+import config from './src/config/index.js';
+import authRouter from "./src/routes/auth.js"
 
 // Intercepts all requests to graphQL endpoint and verifies 
 // that the access token is good and the device is recognized
@@ -56,7 +37,7 @@ const authenticateUser = async (req, res, next) => {
 async function startServer() {
     console.log((config.isProduction ? "Production" : "Developement") + " server starting...")
 
-    mongoose.connect(config.dbUrl, {
+    mongoose.connect(config.authDBUrl, {
         useNewUrlParser: true,
         useUnifiedTopology: true,
       })
@@ -80,58 +61,39 @@ async function startServer() {
     app.use(express.json())
     app.use(express.urlencoded({ extended: false }))
 
-    //REST auth routes
-
     //temp dev logger
-    app.use('/', 
-    (req, res, next) => {
-      let current_datetime = new Date();
-      let formatted_date =
-        current_datetime.getFullYear() +
-        "-" +
-        (current_datetime.getMonth() + 1) +
-        "-" +
-        current_datetime.getDate() +
-        " " +
-        current_datetime.getHours() +
-        ":" +
-        current_datetime.getMinutes() +
-        ":" +
-        current_datetime.getSeconds();
-      let method = req.method;
-      let url = req.url;
-      let status = res.statusCode;
-      let log = `[${formatted_date}] ${method}:${url} ${status}`;
-      console.log(log);
-      console.log(req.body)
-      next();
+    if (!config.isProduction) {
+      app.use('/', 
+      (req, res, next) => {
+        let current_datetime = new Date();
+        let formatted_date =
+          current_datetime.getFullYear() +
+          "-" +
+          (current_datetime.getMonth() + 1) +
+          "-" +
+          current_datetime.getDate() +
+          " " +
+          current_datetime.getHours() +
+          ":" +
+          current_datetime.getMinutes() +
+          ":" +
+          current_datetime.getSeconds();
+        let method = req.method;
+        let url = req.url;
+        let status = res.statusCode;
+        let log = `[${formatted_date}] ${method}:${url} ${status}`;
+        console.log(log);
+        console.log(req.body)
+        next();
+      })
     }
-    )
-    app.use('/register', registerRouter)
-    app.use('/login', loginRouter)
-    app.use('/refresh', refreshRouter)
 
+    app.use('/auth', authRouter)
 
+    app.listen(config.port, () => {
+      console.log(`${config.isProduction ? "Production" : "Development"} server listening on port ${config.port}`)
+    })
 
-
-    const httpServer = http.createServer(app);
-    const server = new ApolloServer({
-        typeDefs,
-        resolvers,
-      plugins: [ApolloServerPluginDrainHttpServer({ httpServer })],
-    });
-    await server.start();
-
-    app.use(
-      '/v1',
-      authenticateUser,
-      expressMiddleware(server, {
-        context: async ({ req }) => ({ user: req.user }),
-      }),
-    );
-  
-    await new Promise((resolve) => httpServer.listen({ port: config.port }, resolve));
-    console.log(`GraphQL endpoint ready at http://localhost:${config.port}/v1`);
   }
 
 startServer()
