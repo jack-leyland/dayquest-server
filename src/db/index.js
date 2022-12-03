@@ -12,7 +12,7 @@ export const postgresQuery = async (queryString, params) => {
     const start = Date.now()
     const res = await pool.query(queryString, params)
     const duration = Date.now() - start
-    console.log('executed query', { text, duration, rows: res.rowCount })
+    console.log('executed query', { queryString, duration, rows: res.rowCount })
     return res
 }
 
