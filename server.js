@@ -5,6 +5,7 @@ import "./src/auth/strategies/index.js"
 import mongoose from 'mongoose';
 import config from './src/config/index.js';
 import authRouter from "./src/routes/auth.js"
+import initializeDatabase from './src/db/initializeDatabase.js';
 
 // Intercepts all requests to graphQL endpoint and verifies 
 // that the access token is good and the device is recognized
@@ -46,13 +47,13 @@ async function startServer() {
     })
     .catch(err => {
         console.log("DB connection failed.")
-        !config.isProduction || console.error(err)
+        !config.isProduction && console.error(err)
     });
     mongoose.connection.on('error', err => {
-        !config.isProduction || console.error("DB connection runtime error: " + err);
+        !config.isProduction && console.error("DB connection runtime error: " + err);
     });
     mongoose.connection.on('disconnected', err => {
-        !config.isProduction || console.log("DB disconnected: " + err);
+        !config.isProduction && console.log("DB disconnected: " + err);
     });
 
     const app = express();
@@ -88,10 +89,12 @@ async function startServer() {
       })
     }
 
-    app.use('/auth', authRouter)
+    app.use('/auth', authRouter);
+
+    initializeDatabase();
 
     app.listen(config.port, () => {
-      console.log(`${config.isProduction ? "Production" : "Development"} server listening on port ${config.port}`)
+      console.log(`${config.isProduction ? "Production" : "Development"} server listening on port ${config.port}`);
     })
 
   }

@@ -3,9 +3,7 @@ import config from '../config/index.js'
 const { Pool } = pg
 
 const connectionString = config.isProduction ? config.DBUrl : config.testDBUrl
-const pool = new Pool({
-    connectionString,
-})
+const pool = new Pool({connectionString,})
 
 
 export const postgresQuery = async (queryString, params) => {

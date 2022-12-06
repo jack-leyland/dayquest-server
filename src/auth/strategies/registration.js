@@ -4,6 +4,7 @@ import {default as UserModel} from '../../models/User.js';
 import {v4 as uuid} from 'uuid';
 import {default as RefreshTokenModel} from '../../models/RefreshTokens.js';
 import { generateTokens} from "../helpers.js";
+import {postgresQuery} from "../../db/index.js"
 
 
 passport.use(
@@ -30,7 +31,7 @@ passport.use(
           const userId = uuid()
           const body = { userId: userId, username: req.body.username};
           const tokens = generateTokens(body, false)
-
+          
           const user = await UserModel.create(
             { 
               userId: userId,
@@ -46,6 +47,9 @@ passport.use(
               deviceId: req.headers.device,
               token: tokens.refresh
           })
+
+          await postgresQuery(`INSERT INTO users("userId", username, email)
+                                VALUES ($1, $2, $3)`, [userId, req.body.username, email])
           
           const userInfoForClient = {email: user.email, username: user.username, userId:user.userId}
           return done(null, userInfoForClient, {tokens: tokens});
