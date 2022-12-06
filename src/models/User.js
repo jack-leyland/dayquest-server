@@ -3,8 +3,6 @@ import bcrypt from 'bcrypt';
 
 const Schema = mongoose.Schema;
 
-// IMPORTANT: refresh token 
-
 const UserSchema = new Schema({
   userId: {
     type: String,
@@ -15,13 +13,11 @@ const UserSchema = new Schema({
   email: {
     type: String,
     required: true,
-    unique: true
   },
 
   username: {
     type: String,
     required: true,
-    unique: true
   },
 
   password: {
@@ -32,6 +28,11 @@ const UserSchema = new Schema({
   devices: {
     type: [String],
     required: true
+  },
+  active: {
+    type: Boolean,
+    required: true,
+    default: true
   }
 
 }, {timestamps: true});

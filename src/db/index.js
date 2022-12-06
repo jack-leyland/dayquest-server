@@ -5,7 +5,6 @@ const { Pool } = pg
 const connectionString = config.isProduction ? config.DBUrl : config.testDBUrl
 const pool = new Pool({connectionString,})
 
-
 export const postgresQuery = async (queryString, params) => {
     const start = Date.now()
     const res = await pool.query(queryString, params)

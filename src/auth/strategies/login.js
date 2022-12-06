@@ -16,9 +16,9 @@ passport.use(
       },
       async (req, id, password, done) => {
         try {
-          let user = await UserModel.findOne({ email: id });
+          let user = await UserModel.findOne({ email: id, active: true});
           if (!user) {
-            user = await UserModel.findOne({ username: id });
+            user = await UserModel.findOne({ username: id, active: true });
           }
           if (!user) {
             return done(null, false, { message: 'No matching account found', badField: "id" });

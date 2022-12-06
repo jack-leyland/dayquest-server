@@ -18,8 +18,9 @@ passport.use(
         try {
           // bad token doesn't make it here
   
-          const userData = await UserModel.findOne({userId: token.user.userId}, "devices")
-          if (!userData.devices.includes(req.headers.device)) {
+          const userData = await UserModel.findOne({userId: token.user.userId, active: true}, "devices")
+
+          if (!userData || !userData.devices.includes(req.headers.device)) {
             return done(false, false, {message: "Unrecognized user device."})
           }
   

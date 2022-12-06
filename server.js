@@ -5,6 +5,7 @@ import "./src/auth/strategies/index.js"
 import mongoose from 'mongoose';
 import config from './src/config/index.js';
 import authRouter from "./src/routes/auth.js"
+import userRouter from "./src/routes/user.js"
 import initializeDatabase from './src/db/initializeDatabase.js';
 
 // Intercepts all requests to graphQL endpoint and verifies 
@@ -90,6 +91,7 @@ async function startServer() {
     }
 
     app.use('/auth', authRouter);
+    app.use('/user', userRouter);
 
     initializeDatabase();
 

@@ -18,20 +18,20 @@ passport.use(
       },
       async (req, email, password, done) => {
         try {
-          const emailExists = await UserModel.findOne({email: email})
-          if (emailExists) {
+          const emailInUse= await UserModel.findOne({email: email, active: true})
+          if (emailInUse) {
             return done(null, false, {alreadyExists: 'email'})
           }
 
-          const usernameExists = await UserModel.findOne({username: req.body.username})
-          if (usernameExists) {
+          const usernameInUse = await UserModel.findOne({username: req.body.username, active: true})
+          if (usernameInUse) {
             return done(null, false, {alreadyExists: 'username'})
           }
           
           const userId = uuid()
           const body = { userId: userId, username: req.body.username};
           const tokens = generateTokens(body, false)
-          
+
           const user = await UserModel.create(
             { 
               userId: userId,
@@ -39,6 +39,7 @@ passport.use(
               password: password, 
               username: req.body.username, 
               devices: [req.headers.device],
+              active: true
             });
 
           await RefreshTokenModel.create(
@@ -48,8 +49,8 @@ passport.use(
               token: tokens.refresh
           })
 
-          await postgresQuery(`INSERT INTO users("userId", username, email)
-                                VALUES ($1, $2, $3)`, [userId, req.body.username, email])
+          await postgresQuery(`INSERT INTO users("userId", username, email, active)
+                                VALUES ($1, $2, $3, $4)`, [userId, req.body.username, email, 1])
           
           const userInfoForClient = {email: user.email, username: user.username, userId:user.userId}
           return done(null, userInfoForClient, {tokens: tokens});

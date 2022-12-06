@@ -23,17 +23,19 @@ export default async (req, res) => {
             }
             if (!user) {
                 res.json({
-                    success: false, 
-                    message: info.message, 
+                    success: false,
+                    message: info.message,
                     badField: info.badField
+                })
+            } else {
+                res.json({
+                    success: true,
+                    access: info.tokens.access,
+                    refresh: info.tokens.refresh,
                 })
             }
 
-            res.json({
-                success: true,
-                access: info.tokens.access,
-                refresh: info.tokens.refresh,
-            })
+
         }
-    )(req,res)
+    )(req, res)
 }
