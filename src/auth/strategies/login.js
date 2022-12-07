@@ -49,9 +49,7 @@ passport.use(
               token: tokens.refresh
             })
           } else {
-            let tokenRecord = await RefreshTokenModel.findOne({userId: user.userId, deviceId: req.headers.device})
-            tokenRecord.token = tokens.refresh
-            await tokenRecord.save()
+            await RefreshTokenModel.findOneAndUpdate({userId: user.userId, deviceId: req.headers.device}, {$set: {token: tokens.refresh}})
           }
           
           await LoginModel.create({

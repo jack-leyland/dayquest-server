@@ -8,34 +8,6 @@ import authRouter from "./src/routes/auth.js"
 import userRouter from "./src/routes/user.js"
 import initializeDatabase from './src/db/initializeDatabase.js';
 
-// Intercepts all requests to graphQL endpoint and verifies 
-// that the access token is good and the device is recognized
-const authenticateUser = async (req, res, next) => {
-  passport.authenticate(
-    'jwt',
-    {session:false},
-    async (err, user, info) => {
-      try {
-          if (err) {
-          console.error(err)
-          res.status(500).send('Server Error')
-          return;
-          }
-          if (!user) {
-              res.status(401).json({message: info.message})
-              return 
-          }
-          req.user = user
-          return next()
-
-      } catch (error) {
-          return next(error);
-      }
-  }
-)(req, res, next);
-} 
-
-
 async function startServer() {
     console.log((config.isProduction ? "Production" : "Developement") + " server starting...")
 

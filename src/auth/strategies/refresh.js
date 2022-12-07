@@ -21,14 +21,14 @@ passport.use(
           const userData = await UserModel.findOne({userId: token.user.userId, active: true}, "devices")
 
           if (!userData || !userData.devices.includes(req.headers.device)) {
-            return done(false, false, {message: "Unrecognized user device."})
+            return done(false, false, {invalid: true})
           }
   
           // Check it exists in records
           const record = await RefreshTokenModel.findOne({userId: token.user.userId, deviceId: req.headers.device})
           const match = await record.isMatch(req.body.refresh_token)
           if(!record || !match) {
-            return done(false, false, {message:"Invalid refresh token."})
+            return done(false, false, {invalid:true})
           }
   
           const body = { userId: token.user.userId, username: token.user.username};

@@ -12,9 +12,11 @@ passport.use(
     },
     async (req, token, done) => {
       try {
-        const userData = await UserModel.findOne({userId: token.user.userId}, "devices")
-        if (!userData.devices.includes(req.headers.device)) {
-          return done(null, false, {message: "unrecognized user device"})
+        const userData = await UserModel.findOne({userId: token.user.userId, active: true}, "devices")
+        if(!userData) {
+          return done(null, false, {notFound: true})
+        } else if (!userData.devices.includes(req.headers.device)) {
+          return done(null, false, null)
         }
         return done(null, token.user);
       } catch (error) {

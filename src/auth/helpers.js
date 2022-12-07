@@ -1,6 +1,7 @@
 
 import jwt from 'jsonwebtoken';
 import {default as config} from '../config/index.js'
+import UserModel from '../models/User.js';
 
 
 export const regRequestisValid = (req) => {
@@ -20,6 +21,11 @@ export const refreshRequestisValid = (req) => {
     if (!Object.hasOwn(req.body, 'refresh_token')) return false;
     return true
   }
+
+export const hasDeviceHeader = (req) => {
+  if (!Object.hasOwn(req.headers, 'device')) return false
+  return true
+}
 
 export const generateTokens = (user, access_only) => {
     const tokens = {

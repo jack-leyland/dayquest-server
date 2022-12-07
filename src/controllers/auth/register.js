@@ -1,5 +1,5 @@
 import passport from 'passport';
-import { regRequestisValid } from '../../auth/helpers.js';
+import { hasDeviceHeader, regRequestisValid } from '../../auth/helpers.js';
 
 export default async (req, res) => {
 
@@ -7,7 +7,7 @@ export default async (req, res) => {
     return res.status(400).json(
       {message: "Bad Request. Missing registation fields."}
     )
-  } else if (!Object.hasOwn(req.headers, "device")) {
+  } else if (!hasDeviceHeader(req)) {
     return res.status(400).json(
       {message: "Bad Request. Missing device header."}
     )
